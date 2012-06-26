@@ -50,7 +50,7 @@
     locationManager = [[CLLocationManager alloc] init];
     locationManager.delegate = self;
     locationManager.distanceFilter = kCLDistanceFilterNone;
-    locationManager.desiredAccuracy = kCLLocationAccuracyHundredMeters;
+    locationManager.desiredAccuracy = kCLLocationAccuracyBest;
 }
 
 - (void)viewDidUnload
@@ -70,21 +70,37 @@
 - (void)locationManager:(CLLocationManager *)manager didUpdateToLocation:(CLLocation *)newLocation fromLocation:(CLLocation *)oldLocation
 {
     [locationManager stopUpdatingLocation];
-    
-    float latitudeDegrees = newLocation.coordinate.latitude;
-    float longitudeDegrees = newLocation.coordinate.longitude;
+
+    float latitude = newLocation.coordinate.latitude;
+    float longitude = newLocation.coordinate.longitude;
     
     Location *location = [[Location alloc] init];
-    location.latitude = [NSNumber numberWithFloat:latitudeDegrees];
-    location.longitude = [NSNumber numberWithFloat:longitudeDegrees];
+    location.latitude = [NSNumber numberWithFloat:latitude];
+    location.longitude = [NSNumber numberWithFloat:longitude];
     
     [[LocationDataManager sharedLocationDataManager].locations addObject:location];
     [[LocationDataManager sharedLocationDataManager] saveLocations];
     
     [locationsTableView reloadData];
     
-    // this should happen asynchronously INSTEAD
-    NSDictionary *innerDictionary = [[NSDictionary alloc] initWithObjectsAndKeys:[NSString stringWithFormat:@"%f", longitudeDegrees], @"longitude", [NSString stringWithFormat:@"%f", latitudeDegrees], @"latitude", [[NSUserDefaults standardUserDefaults] stringForKey:@"uniqueID"], @"unique_id", nil];
+    [self sendToServer:latitude :longitude];
+}
+
+- (void)locationManager:(CLLocationManager *)manager didFailWithError:(NSError *)error
+{
+    NSLog(@"%@", error);
+}
+
+#pragma mark - Server methods
+
+// this should really happen asynchronously
+- (void)sendToServer:(float)aLatitude :(float)aLongitude
+{
+    NSString *latitudeString = [NSString stringWithFormat:@"%f", aLatitude];
+    NSString *longitudeString = [NSString stringWithFormat:@"%f", aLongitude];
+    NSString *uniqueIDString = [[NSUserDefaults standardUserDefaults] stringForKey:@"uniqueID"];
+    
+    NSDictionary *innerDictionary = [[NSDictionary alloc] initWithObjectsAndKeys:longitudeString, @"longitude", latitudeString, @"latitude", uniqueIDString, @"unique_id", nil];
     NSDictionary *outerDictionary = [[NSDictionary alloc] initWithObjectsAndKeys:innerDictionary, @"location", nil];
     
     NSError *error;
@@ -99,15 +115,10 @@
     [request setValue:@"application/json" forHTTPHeaderField:@"Content-Type"];
     request.HTTPMethod = @"POST";
     request.HTTPBody = jsonData;
-        
+    
     NSData *requestData = [NSURLConnection sendSynchronousRequest: request returningResponse: nil error: nil];
     NSString *get = [[NSString alloc] initWithData: requestData encoding: NSUTF8StringEncoding];
     NSLog(@">%@<",get);
-}
-
-- (void)locationManager:(CLLocationManager *)manager didFailWithError:(NSError *)error
-{
-    NSLog(@"%@", error);
 }
 
 #pragma mark - Table view methods

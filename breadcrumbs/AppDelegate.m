@@ -22,14 +22,7 @@
 
 - (BOOL)application:(UIApplication *)application didFinishLaunchingWithOptions:(NSDictionary *)launchOptions
 {
-    if (![[NSUserDefaults standardUserDefaults] stringForKey:@"uniqueID"]) {
-        CFUUIDRef uuidObject = CFUUIDCreate(kCFAllocatorDefault);
-        NSString *uuidString = [(NSString *)CFUUIDCreateString(kCFAllocatorDefault, uuidObject) autorelease];
-        
-        NSUserDefaults *preferences = [NSUserDefaults standardUserDefaults];
-        [preferences setObject:uuidString forKey:@"uniqueID"];
-        [preferences synchronize]; 
-    }
+    if (![[NSUserDefaults standardUserDefaults] stringForKey:@"uniqueID"]) [self setUniqueID];
 
     self.window = [[UIWindow alloc] initWithFrame:[UIScreen mainScreen].bounds];
     self.window.backgroundColor = [UIColor blackColor];
@@ -70,6 +63,18 @@
 - (void)applicationWillTerminate:(UIApplication *)application
 {
     // Called when the application is about to terminate. Save data if appropriate. See also applicationDidEnterBackground:.
+}
+
+#pragma mark - Unique ID methods
+
+- (void)setUniqueID 
+{
+    CFUUIDRef uuid = CFUUIDCreate(kCFAllocatorDefault);
+    NSString *uuidString = (NSString *)CFUUIDCreateString(kCFAllocatorDefault, uuid);
+        
+    NSUserDefaults *preferences = [NSUserDefaults standardUserDefaults];
+    [preferences setObject:uuidString forKey:@"uniqueID"];
+    [preferences synchronize]; 
 }
 
 @end
