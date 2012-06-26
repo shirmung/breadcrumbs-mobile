@@ -15,8 +15,7 @@
 - (id)init 
 {
     if (self = [super init]) {
-//        latitude = [NSNumber numberWithFloat:0.0];
-//        longitude = [NSNumber numberWithFloat:0.0];
+        // Custom initialization
     }
     
     return self;

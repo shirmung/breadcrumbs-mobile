@@ -25,8 +25,6 @@
     
     if (self) {
         // Custom initialization
-        
-        flag = FALSE;
     }
     
     return self;
@@ -101,9 +99,7 @@
     [request setValue:@"application/json" forHTTPHeaderField:@"Content-Type"];
     request.HTTPMethod = @"POST";
     request.HTTPBody = jsonData;
-    
-    [[UIApplication sharedApplication] setNetworkActivityIndicatorVisible:YES]; 
-    
+        
     NSData *requestData = [NSURLConnection sendSynchronousRequest: request returningResponse: nil error: nil];
     NSString *get = [[NSString alloc] initWithData: requestData encoding: NSUTF8StringEncoding];
     NSLog(@">%@<",get);
@@ -132,13 +128,12 @@
     UITableViewCell *cell = [tableView dequeueReusableCellWithIdentifier:CellIdentifier];
     
     if (cell == nil) {
-        cell = [[[UITableViewCell alloc] initWithStyle:UITableViewCellStyleSubtitle reuseIdentifier:CellIdentifier] autorelease];
+        cell = [[[UITableViewCell alloc] initWithStyle:UITableViewCellStyleDefault reuseIdentifier:CellIdentifier] autorelease];
     }
     
     Location *specificLocation = [[LocationDataManager sharedLocationDataManager].locations objectAtIndex:[indexPath row]];
     
-    cell.textLabel.text = @"TIME?";
-    cell.detailTextLabel.text = [NSString stringWithFormat:@"%f, %f", [specificLocation.latitude floatValue], [specificLocation.longitude floatValue]];
+    cell.textLabel.text = [NSString stringWithFormat:@"%f, %f", [specificLocation.latitude floatValue], [specificLocation.longitude floatValue]];
     cell.accessoryType = UITableViewCellAccessoryDisclosureIndicator;
     
     return cell;

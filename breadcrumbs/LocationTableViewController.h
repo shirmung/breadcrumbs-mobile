@@ -13,8 +13,6 @@
 {
     UITableView *locationsTableView;
     CLLocationManager *locationManager;
-    
-    BOOL flag;
 }
 
 @property (nonatomic, retain) IBOutlet UITableView *locationsTableView;
